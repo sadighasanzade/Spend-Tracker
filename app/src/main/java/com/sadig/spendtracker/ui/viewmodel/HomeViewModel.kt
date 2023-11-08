@@ -4,11 +4,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sadig.spendtracker.data.model.Spending
 import com.sadig.spendtracker.data.source.local.UserPreferencesDataSourceImpl
 import com.sadig.spendtracker.domain.repository.DataStoreRepository
 import com.sadig.spendtracker.domain.repository.SpendingRepository
 import com.sadig.spendtracker.domain.source.local.UserPreferencesDataSource
 import com.sadig.spendtracker.domain.usecase.PutCurrencyInteractor
+import com.sadig.spendtracker.domain.usecase.PutSpendingInteractor
 import com.sadig.spendtracker.domain.usecase.ReadCurrencyInteractor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     val putCurrencyInteractor: PutCurrencyInteractor,
-    val getCurrencyInteractor: ReadCurrencyInteractor
+    val getCurrencyInteractor: ReadCurrencyInteractor,
+    val putSpendingInteractor: PutSpendingInteractor
 ) : ViewModel() {
     private val _shouldShowAddDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val shouldShowAddDialog: StateFlow<Boolean> = _shouldShowAddDialog
@@ -37,6 +40,13 @@ class HomeViewModel @Inject constructor(
     fun saveSpending(title: String, description: String, amount: Double, date: Date) =
         viewModelScope.launch {
             _shouldShowAddDialog.emit(false)
+            val spending = Spending(
+                title = title,
+                description = description,
+                amount = amount,
+                date = date
+            )
+            putSpendingInteractor(spending)
         }
 
     fun onEvent(event: EventType) = viewModelScope.launch {
