@@ -39,7 +39,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val viewmodel by viewModels<HomeViewModel>()
         setContent {
-            SpendTrackerTheme {
+            SpendTrackerTheme(
+                dynamicColor = false
+            ) {
                 ScreenWithBottomAppBar(viewModel = viewmodel)
             }
         }
@@ -55,6 +57,7 @@ fun ScreenWithBottomAppBar(viewModel: HomeViewModel) {
         bottomBar = { BottomNavigationBar(navController = navController) },
         floatingActionButton = {
             AddSpendingButton {
+                navController.navigate(BottomNavigationItem.Home.route)
                 viewModel.onEvent(HomeViewModel.EventType.OnAddSpendButtonClicked)
             }
         }
