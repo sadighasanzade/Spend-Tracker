@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class RepositoryComponent {
+abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindDataStoreRepository(
