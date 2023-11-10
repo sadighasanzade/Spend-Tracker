@@ -20,8 +20,8 @@ object RoomModule {
     fun providesDb(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(
             context,
-            AppDatabase::class.java, "spendings"
-        ).build()
+            AppDatabase::class.java, "spendings_db"
+        ).allowMainThreadQueries().build()
     }
     @Provides
     @Singleton

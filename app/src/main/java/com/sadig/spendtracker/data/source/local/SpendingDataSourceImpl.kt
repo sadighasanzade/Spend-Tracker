@@ -6,7 +6,7 @@ import com.sadig.spendtracker.domain.source.local.SpendingDataSource
 import javax.inject.Inject
 
 class SpendingDataSourceImpl @Inject constructor(val spendingDAO: SpendingDAO) : SpendingDataSource {
-    override fun putSpending(spending: Spending) {
+    override suspend fun putSpending(spending: Spending) {
         spendingDAO.insertAll(spending)
     }
 

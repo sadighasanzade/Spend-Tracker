@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class SpendingRepositoryImpl @Inject constructor(val spendingDataSource: SpendingDataSource) :
     SpendingRepository {
-    override fun putSpending(spending: Spending) {
+    override suspend fun putSpending(spending: Spending) {
         spendingDataSource.putSpending(spending = spending)
     }
 }
