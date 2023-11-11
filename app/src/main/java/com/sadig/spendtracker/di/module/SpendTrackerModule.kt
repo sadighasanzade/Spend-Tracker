@@ -12,6 +12,7 @@ import com.sadig.spendtracker.domain.repository.DataStoreRepository
 import com.sadig.spendtracker.domain.repository.SpendingRepository
 import com.sadig.spendtracker.domain.source.local.SpendingDataSource
 import com.sadig.spendtracker.domain.source.local.UserPreferencesDataSource
+import com.sadig.spendtracker.domain.usecase.GetSpendingsInteractor
 import com.sadig.spendtracker.domain.usecase.PutCurrencyInteractor
 import com.sadig.spendtracker.domain.usecase.PutSpendingInteractor
 import com.sadig.spendtracker.domain.usecase.ReadCurrencyInteractor
@@ -62,5 +63,11 @@ object SpendTrackerModule {
     @Singleton
     fun providesPutSpendingInteractor(spendingRepository: SpendingRepository): PutSpendingInteractor {
         return PutSpendingInteractor(spendingRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesGetSpendingsInteractor(spendingRepository: SpendingRepository): GetSpendingsInteractor {
+        return GetSpendingsInteractor(spendingRepository)
     }
 }

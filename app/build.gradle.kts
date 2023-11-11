@@ -105,7 +105,6 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation("androidx.multidex:multidex:2.0.1")
-
-
+    implementation ("co.yml:ycharts:2.1.0")
 }
 

@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -74,7 +75,7 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavigationItem.History,
     )
     BottomNavigation(
-        backgroundColor = Color.Red,
+        backgroundColor = MaterialTheme.colorScheme.primary,
         contentColor = Color.Black
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -86,7 +87,7 @@ fun BottomNavigationBar(navController: NavController) {
                     Text(
                         text = item.title,
                         fontSize = 12.sp,
-                        color = Color.White
+                        color = if(currentRoute == item.route) Color.White else MaterialTheme.colorScheme.tertiary
                     )
                 },
                 selectedContentColor = Color.White,
@@ -113,9 +114,9 @@ fun BottomNavigationBar(navController: NavController) {
 @Composable
 fun Navigation(navController: NavHostController, viewModel: HomeViewModel) {
     NavHost(navController = navController, startDestination = BottomNavigationItem.Home.route) {
-        composable(BottomNavigationItem.Graphs.route) { GraphsScreen() }
+        composable(BottomNavigationItem.Graphs.route) { GraphsScreen(viewModel) }
         composable(BottomNavigationItem.Home.route) { HomeScreen(viewModel) }
-        composable(BottomNavigationItem.History.route) { HistoryScreen() }
+        composable(BottomNavigationItem.History.route) { HistoryScreen(viewModel) }
     }
 }
 

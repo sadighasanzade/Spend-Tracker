@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -26,6 +28,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -41,12 +44,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.sadig.spendtracker.data.model.Spending
 import com.sadig.spendtracker.ui.theme.*
 import com.sadig.spendtracker.ui.viewmodel.HomeViewModel
 import java.text.SimpleDateFormat
@@ -78,14 +85,72 @@ fun HomeScreen(viewModel: HomeViewModel) {
         )
 
     }
-    ShowSpendings()
+    ShowSpendings(
+        viewModel = viewModel,
+        currency = currency.value ?: "",
+        HomeViewModel.FetchType.ThisMonth
+    )
 
+}
+
+@Composable
+fun SpendingItem(spending: Spending, modifier: Modifier, currency: String, showDate: Boolean) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(Modifier.padding(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = spending.title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(
+                    text = "${spending.amount} $currency",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+            }
+            Spacer(modifier = Modifier.size(6.dp))
+            spending.description?.let { Text(text = it, fontSize = 14.sp) }
+            if (showDate) {
+                Spacer(modifier = Modifier.size(5.dp))
+                Text(text = java.sql.Date(spending.date.time).toString(), fontSize = 13.sp)
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun SpendingItemPreview() {
+    SpendingItem(
+        spending = Spending(
+            title = "Yemek",
+            description = "cox pul xercleme",
+            amount = 5.6,
+            date = Date()
+        ), modifier = Modifier.padding(12.dp), currency = "EUR", true
+    )
 }
 
 
 @Composable
-fun ShowSpendings() {
+fun ShowSpendings(viewModel: HomeViewModel, currency: String, type: HomeViewModel.FetchType) {
 
+    val spendings = when (type) {
+        HomeViewModel.FetchType.MonthByMonth -> viewModel.monthByMonthSpending.collectAsState()
+        HomeViewModel.FetchType.ThisMonth -> viewModel.spendingOfThisMonth.collectAsState()
+    }
+    LazyColumn(modifier = Modifier.padding(bottom = 60.dp)) {
+        items(spendings.value) {
+            SpendingItem(
+                spending = it, modifier = Modifier.padding(12.dp), currency = currency,
+                type == HomeViewModel.FetchType.ThisMonth
+            )
+        }
+    }
 }
 
 
@@ -106,64 +171,66 @@ fun SpinnerDialog(
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                 ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.padding(16.dp)) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Select your currency",
+                            fontSize = 20.sp,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        // Spinner
+                        Row(modifier = Modifier.fillMaxWidth()) {
                             Text(
-                                text = "Select your currency",
-                                fontSize = 20.sp,
-                                modifier = Modifier.padding(bottom = 16.dp)
+                                text = "Selected: ",
+                                fontSize = 16.sp,
+                                modifier = Modifier
+                                    .clickable { isDropdownVisible = true }
+                                    .padding(16.dp)
+                                    .padding(8.dp),
                             )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = selectedValue,
+                                fontSize = 16.sp,
+                                modifier = Modifier
+                                    .clickable { isDropdownVisible = true }
+                                    .padding(16.dp)
+                                    .padding(8.dp),
+                                style = androidx.compose.ui.text.TextStyle(fontWeight = FontWeight.Bold)
+                            )
+                        }
 
-                            // Spinner
-                            Row(modifier = Modifier.fillMaxWidth()) {
-                                Text(
-                                    text = "Selected: ",
-                                    fontSize = 16.sp,
+
+
+                        if (isDropdownVisible) {
+                            options.forEach { option ->
+                                OutlinedButton(
+                                    onClick = {
+                                        selectedValue = option
+                                        isDropdownVisible = false
+                                    },
                                     modifier = Modifier
-                                        .clickable { isDropdownVisible = true }
-                                        .padding(16.dp)
-                                        .padding(8.dp),
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text(
-                                    text = selectedValue,
-                                    fontSize = 16.sp,
-                                    modifier = Modifier
-                                        .clickable { isDropdownVisible = true }
-                                        .padding(16.dp)
-                                        .padding(8.dp),
-                                    style = androidx.compose.ui.text.TextStyle(fontWeight = FontWeight.Bold)
-                                )
-                            }
-
-
-
-                            if (isDropdownVisible) {
-                                options.forEach { option ->
-                                    OutlinedButton(
-                                        onClick = {
-                                            selectedValue = option
-                                            isDropdownVisible = false
-                                        },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(4.dp)
-                                    ) {
-                                        Text(text = option)
-                                    }
+                                        .fillMaxWidth()
+                                        .padding(4.dp)
+                                ) {
+                                    Text(text = option)
                                 }
                             }
-
-                            // OK button
-                            Button(
-                                onClick = { onOkClick(selectedValue) },
-                                shape = RoundedCornerShape(10.dp),
-
-                                modifier = Modifier.padding(top = 16.dp)
-                            ) {
-                                Text(text = "OK")
-                            }
                         }
+
+                        // OK button
+                        Button(
+                            onClick = { onOkClick(selectedValue) },
+                            shape = RoundedCornerShape(10.dp),
+
+                            modifier = Modifier.padding(top = 16.dp)
+                        ) {
+                            Text(text = "OK")
+                        }
+                    }
                 }
             }
         )
@@ -182,7 +249,7 @@ fun InputDialog(
     var amount by remember { mutableStateOf(TextFieldValue()) }
     var selectedDate by remember { mutableStateOf(Date()) }
     var showDateDialog by remember { mutableStateOf(false) }
-    Surface( shape = RoundedCornerShape(16.dp)){
+    Surface(shape = RoundedCornerShape(16.dp)) {
         AlertDialog(
             onDismissRequest = { onDismiss() },
             title = { Text("Enter Details") },

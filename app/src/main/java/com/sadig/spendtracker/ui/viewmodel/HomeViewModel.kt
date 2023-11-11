@@ -1,5 +1,6 @@
 package com.sadig.spendtracker.ui.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ import com.sadig.spendtracker.data.source.local.UserPreferencesDataSourceImpl
 import com.sadig.spendtracker.domain.repository.DataStoreRepository
 import com.sadig.spendtracker.domain.repository.SpendingRepository
 import com.sadig.spendtracker.domain.source.local.UserPreferencesDataSource
+import com.sadig.spendtracker.domain.usecase.GetSpendingsInteractor
 import com.sadig.spendtracker.domain.usecase.PutCurrencyInteractor
 import com.sadig.spendtracker.domain.usecase.PutSpendingInteractor
 import com.sadig.spendtracker.domain.usecase.ReadCurrencyInteractor
@@ -22,12 +24,30 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    val putCurrencyInteractor: PutCurrencyInteractor,
-    val getCurrencyInteractor: ReadCurrencyInteractor,
-    val putSpendingInteractor: PutSpendingInteractor
+    private val putCurrencyInteractor: PutCurrencyInteractor,
+    private val getCurrencyInteractor: ReadCurrencyInteractor,
+    private val putSpendingInteractor: PutSpendingInteractor,
+    private val getSpendingsInteractor: GetSpendingsInteractor
 ) : ViewModel() {
     private val _shouldShowAddDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val shouldShowAddDialog: StateFlow<Boolean> = _shouldShowAddDialog
+
+    private val _spendingsOfThisMonth: MutableStateFlow<List<Spending>> = MutableStateFlow(listOf())
+    val spendingOfThisMonth: StateFlow<List<Spending>> = _spendingsOfThisMonth
+
+    private val _monthByMonthSpending: MutableStateFlow<List<Spending>> = MutableStateFlow(listOf())
+    val monthByMonthSpending: StateFlow<List<Spending>> = _monthByMonthSpending
+    enum class FetchType {
+        ThisMonth,
+        MonthByMonth
+    }
+
+    init {
+        viewModelScope.launch {
+            _spendingsOfThisMonth.emit(getSpendingsInteractor(FetchType.ThisMonth))
+            _monthByMonthSpending.emit(getSpendingsInteractor(FetchType.MonthByMonth))
+        }
+    }
 
     fun setShowDialogStatus(status: Boolean) = viewModelScope.launch {
         _shouldShowAddDialog.emit(status)
@@ -47,6 +67,12 @@ class HomeViewModel @Inject constructor(
                 date = date
             )
             putSpendingInteractor(spending)
+            _spendingsOfThisMonth.emit(
+                _spendingsOfThisMonth.value.plus(spending).sortedByDescending { it.date })
+
+            _monthByMonthSpending.emit(getSpendingsInteractor(FetchType.MonthByMonth))
+
+
         }
 
     fun onEvent(event: EventType) = viewModelScope.launch {
