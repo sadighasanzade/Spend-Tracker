@@ -13,7 +13,8 @@ sealed class BottomNavigationItem(
     val title: String,
     val icon: @Composable () -> Unit
 ) {
-    object Home : BottomNavigationItem("home", "Home",
+    object Home : BottomNavigationItem(
+        ROUTE_HOME, "Home",
         {
             Icon(
                 painter = painterResource(id = R.drawable.home),
@@ -23,7 +24,7 @@ sealed class BottomNavigationItem(
             )
         })
 
-    object History : BottomNavigationItem("history", "History", {
+    object History : BottomNavigationItem(ROUTE_HISTORY, "History", {
         Icon(
             painter = painterResource(id = R.drawable.history),
             contentDescription = "history",
@@ -32,7 +33,7 @@ sealed class BottomNavigationItem(
         )
     })
 
-    object Graphs : BottomNavigationItem("graphs", "Graphs", {
+    object Graphs : BottomNavigationItem(ROUTE_GRAPHS, "Graphs", {
         Icon(
             painter = painterResource(id = R.drawable.graph),
             contentDescription = "graphs",
@@ -40,4 +41,10 @@ sealed class BottomNavigationItem(
             Modifier.size(28.dp)
         )
     })
+
+    companion object {
+        val ROUTE_HOME = "home"
+        val ROUTE_GRAPHS = "graphs"
+        val ROUTE_HISTORY = "history"
+    }
 }

@@ -1,19 +1,12 @@
 package com.sadig.spendtracker.ui.viewmodel
 
-import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sadig.spendtracker.data.model.Spending
-import com.sadig.spendtracker.data.source.local.UserPreferencesDataSourceImpl
-import com.sadig.spendtracker.domain.repository.DataStoreRepository
-import com.sadig.spendtracker.domain.repository.SpendingRepository
-import com.sadig.spendtracker.domain.source.local.UserPreferencesDataSource
-import com.sadig.spendtracker.domain.usecase.GetSpendingsInteractor
-import com.sadig.spendtracker.domain.usecase.PutCurrencyInteractor
-import com.sadig.spendtracker.domain.usecase.PutSpendingInteractor
-import com.sadig.spendtracker.domain.usecase.ReadCurrencyInteractor
+import com.sadig.spendtracker.domain.usecase.GetSpendingsUseCase
+import com.sadig.spendtracker.domain.usecase.PutCurrencyUseCase
+import com.sadig.spendtracker.domain.usecase.PutSpendingUseCase
+import com.sadig.spendtracker.domain.usecase.ReadCurrencyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,10 +17,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val putCurrencyInteractor: PutCurrencyInteractor,
-    private val getCurrencyInteractor: ReadCurrencyInteractor,
-    private val putSpendingInteractor: PutSpendingInteractor,
-    private val getSpendingsInteractor: GetSpendingsInteractor
+    private val putCurrencyInteractor: PutCurrencyUseCase,
+    private val getCurrencyInteractor: ReadCurrencyUseCase,
+    private val putSpendingInteractor: PutSpendingUseCase,
+    private val getSpendingsInteractor: GetSpendingsUseCase
 ) : ViewModel() {
     private val _shouldShowAddDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val shouldShowAddDialog: StateFlow<Boolean> = _shouldShowAddDialog
@@ -37,6 +30,7 @@ class HomeViewModel @Inject constructor(
 
     private val _monthByMonthSpending: MutableStateFlow<List<Spending>> = MutableStateFlow(listOf())
     val monthByMonthSpending: StateFlow<List<Spending>> = _monthByMonthSpending
+
     enum class FetchType {
         ThisMonth,
         MonthByMonth

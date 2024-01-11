@@ -12,10 +12,10 @@ import com.sadig.spendtracker.domain.repository.DataStoreRepository
 import com.sadig.spendtracker.domain.repository.SpendingRepository
 import com.sadig.spendtracker.domain.source.local.SpendingDataSource
 import com.sadig.spendtracker.domain.source.local.UserPreferencesDataSource
-import com.sadig.spendtracker.domain.usecase.GetSpendingsInteractor
-import com.sadig.spendtracker.domain.usecase.PutCurrencyInteractor
-import com.sadig.spendtracker.domain.usecase.PutSpendingInteractor
-import com.sadig.spendtracker.domain.usecase.ReadCurrencyInteractor
+import com.sadig.spendtracker.domain.usecase.GetSpendingsUseCase
+import com.sadig.spendtracker.domain.usecase.PutCurrencyUseCase
+import com.sadig.spendtracker.domain.usecase.PutSpendingUseCase
+import com.sadig.spendtracker.domain.usecase.ReadCurrencyUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,26 +48,22 @@ object SpendTrackerModule {
     }
 
     @Provides
-    @Singleton
-    fun providesGetCurrencyInteractor(dataStoreRepository: DataStoreRepository): ReadCurrencyInteractor {
-        return ReadCurrencyInteractor(dataStoreRepository)
+    fun providesGetCurrencyInteractor(dataStoreRepository: DataStoreRepository): ReadCurrencyUseCase {
+        return ReadCurrencyUseCase(dataStoreRepository)
     }
 
     @Provides
-    @Singleton
-    fun providesPutCurrencyInteractor(dataStoreRepository: DataStoreRepository): PutCurrencyInteractor {
-        return PutCurrencyInteractor(dataStoreRepository)
+    fun providesPutCurrencyInteractor(dataStoreRepository: DataStoreRepository): PutCurrencyUseCase {
+        return PutCurrencyUseCase(dataStoreRepository)
     }
 
     @Provides
-    @Singleton
-    fun providesPutSpendingInteractor(spendingRepository: SpendingRepository): PutSpendingInteractor {
-        return PutSpendingInteractor(spendingRepository)
+    fun providesPutSpendingInteractor(spendingRepository: SpendingRepository): PutSpendingUseCase {
+        return PutSpendingUseCase(spendingRepository)
     }
 
     @Provides
-    @Singleton
-    fun providesGetSpendingsInteractor(spendingRepository: SpendingRepository): GetSpendingsInteractor {
-        return GetSpendingsInteractor(spendingRepository)
+    fun providesGetSpendingsInteractor(spendingRepository: SpendingRepository): GetSpendingsUseCase {
+        return GetSpendingsUseCase(spendingRepository)
     }
 }
