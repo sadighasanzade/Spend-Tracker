@@ -4,6 +4,7 @@ import java.util.Calendar
 import java.util.Date
 
 object Utils {
+    val DEFAULT_CURRENCY = "Eur"
     fun getMonthYear(date: Date): String {
         val calendar = Calendar.getInstance()
         calendar.time = date

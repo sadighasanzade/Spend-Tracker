@@ -10,7 +10,7 @@ import java.time.ZoneId
 import java.util.Date
 import javax.inject.Inject
 
-class GetSpendingsInteractor @Inject constructor(val spendingRepository: SpendingRepository) {
+class GetSpendingsUseCase @Inject constructor(val spendingRepository: SpendingRepository) {
     suspend operator fun invoke(fetchType: HomeViewModel.FetchType): List<Spending> {
         val month = LocalDate.now().month
         val year = LocalDate.now().year
